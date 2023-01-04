@@ -7,5 +7,8 @@ data/
 # python file from https://github.com/WZMIAOMIAO/deep-learning-for-image-processing
 */wz_model.py
 
+# cache file
+*/__pycache__/
+
 # test file
 test.ipynb
