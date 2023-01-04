@@ -1,0 +1,2 @@
+Network,Parameter,Epoch,GPU,Speed(train+eval) sec,Batch size,Lr,Best test acc,Time cost(sec)
+Lenet,"120,382",10,Tesla T4,,256,0.1,0.88,26.250956773757935
