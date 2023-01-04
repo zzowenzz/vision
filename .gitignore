@@ -1,2 +1,11 @@
+# data
+data/
+
+# trained weight
+*/*.pth
+
 # python file from https://github.com/WZMIAOMIAO/deep-learning-for-image-processing
 */wz_model.py
+
+# test file
+test.ipynb
