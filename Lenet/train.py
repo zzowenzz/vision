@@ -47,7 +47,7 @@ optimizer = torch.optim.SGD(net.parameters(), lr=lr)
 loss = nn.CrossEntropyLoss()
 
 # Create empty dataframe to record the training record
-df = pd.DataFrame(columns=["Network", "Parameter", "Epoch", "GPU", "Speed(train+eval) sec", "Batch size", "Lr","Best test acc"])
+df = pd.DataFrame(columns=["Network", "Parameter", "Epoch", "GPU", "Time cost(sec)", "Batch size", "Lr","Best test acc"])
 
 # Train
 print("Train {} on {}".format(net_name, device))
@@ -83,14 +83,14 @@ for epoch in range(num_epochs):
         best_acc = test_acc
         torch.save(net.state_dict(), save_path)
     time_end = time.time()
-    total_time += time_end - batch_time
+    total_time += (time_end - batch_time)
     print("Epoch {}, train_loss {}, train_acc {}, best_acc {}, test_acc {}, time cost {} sec".format(epoch+1, "%.4f" % train_loss, "%.2f" % train_acc, "%.2f" %best_acc, "%.2f" %test_acc,  "%.2f" %(time_end - batch_time)))
 # number of parameter
 with open("architecture.txt", "r") as f:
     for line in f:
         if "Total params: " in line:
             num_para = line.split()[-1]
-df = pd.concat([df, pd.DataFrame.from_records([{"Network":net_name, "Parameter": num_para, "Epoch":num_epochs, "GPU":torch.cuda.get_device_name(0), "Time cost(sec)":total_time, "Batch size":batch_size, "Lr":lr, "Best test acc":best_acc}])])
+df = pd.concat([df, pd.DataFrame.from_records([{"Network":net_name, "Parameter": num_para, "Epoch":num_epochs, "GPU":torch.cuda.get_device_name(0), "Time cost(sec)": "%.1f" %total_time , "Batch size":batch_size, "Lr":lr, "Best test acc":best_acc}])])
 df.to_csv(net_name+".csv",index=False,header=True)
 print("\nFinish training")
 
