@@ -1,2 +1,2 @@
-Network,Parameter,Epoch,GPU,Time cost(sec),Batch size,Lr,Best test acc
-Lenet,"120,382",10,Tesla T4,26.9,256,0.1,0.864
+Network,Parameter,Dataset,Epoch,Device,Time cost(sec),Batch size,Lr,Best test acc
+Lenet,"120,382",FashionMNIST,10,Tesla T4,26.7,256,0.1,0.8808
