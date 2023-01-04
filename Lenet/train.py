@@ -27,7 +27,6 @@ def load_data(batch_size):
             data.DataLoader(test, batch_size, shuffle=False,num_workers=multiprocessing.cpu_count()), 
             len(train), 
             len(test))
-
 # Hyper-parameter: batch_size, lr, num_epochs
 batch_size = 256
 lr, num_epochs = 0.1, 10
@@ -47,7 +46,7 @@ optimizer = torch.optim.SGD(net.parameters(), lr=lr)
 loss = nn.CrossEntropyLoss()
 
 # Create empty dataframe to record the training record
-df = pd.DataFrame(columns=["Network", "Parameter", "Epoch", "GPU", "Time cost(sec)", "Batch size", "Lr","Best test acc"])
+df = pd.DataFrame(columns=["Network", "Parameter", "Dataset", "Epoch", "Device", "Time cost(sec)", "Batch size", "Lr","Best test acc"])
 
 # Train
 print("Train {} on {}".format(net_name, device))
@@ -90,7 +89,7 @@ with open("architecture.txt", "r") as f:
     for line in f:
         if "Total params: " in line:
             num_para = line.split()[-1]
-df = pd.concat([df, pd.DataFrame.from_records([{"Network":net_name, "Parameter": num_para, "Epoch":num_epochs, "GPU":torch.cuda.get_device_name(0), "Time cost(sec)": "%.1f" %total_time , "Batch size":batch_size, "Lr":lr, "Best test acc":best_acc}])])
+df = pd.concat([df, pd.DataFrame.from_records([{"Network":net_name, "Parameter": num_para, "Dataset":"FashionMNIST", "Epoch":num_epochs, "Device":torch.cuda.get_device_name(0), "Time cost(sec)": "%.1f" %total_time , "Batch size":batch_size, "Lr":lr, "Best test acc":best_acc}])])
 df.to_csv(net_name+".csv",index=False,header=True)
 print("\nFinish training")
 
