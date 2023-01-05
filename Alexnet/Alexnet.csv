@@ -1,0 +1,2 @@
+Network,Parameter,Dataset,Epoch,Device,Time cost(sec),Batch size,Lr,Best test acc
+Alexnet,"46,764,746",FashionMNIST,10,Tesla T4,444.4,256,0.1,0.896
