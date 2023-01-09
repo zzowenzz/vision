@@ -1,2 +1,3 @@
 Network,Parameter,Dataset,Epoch,Device,Time cost(sec),Batch size,Lr,Best test acc
 Lenet,"120,382",FashionMNIST,10,Tesla T4,26.7,256,0.1,0.8808
+Lenet,"120,382",FashionMNIST,10,Quadro RTX 5000,19.4,256,0.1,0.8623

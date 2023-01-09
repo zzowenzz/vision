@@ -46,11 +46,13 @@ optimizer = torch.optim.SGD(net.parameters(), lr=lr)
 loss = nn.CrossEntropyLoss()
 
 # Create empty dataframe to record the training record
-df = pd.DataFrame(columns=["Network", "Parameter", "Dataset", "Epoch", "Device", "Time cost(sec)", "Batch size", "Lr","Best test acc"])
+if not os.path.exists(net_name+".csv"):
+    df = pd.DataFrame(columns=["Network", "Parameter", "Dataset", "Epoch", "Device", "Time cost(sec)", "Batch size", "Lr","Best test acc"])
+df = pd.read_csv(os.getcwd()+"/"+net_name+".csv")
 
 # Train
 print("Train {} on {}".format(net_name, device))
-print("{} images for training, {}images for validation\n".format(num_train,num_test))
+print("{} images for training, {} images for validation\n".format(num_train,num_test))
 total_time = 0.0
 for epoch in range(num_epochs):
     batch_time = time.time()
