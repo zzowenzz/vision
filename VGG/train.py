@@ -46,11 +46,13 @@ optimizer = torch.optim.SGD(net.parameters(), lr=lr)
 loss = nn.CrossEntropyLoss()
 
 # Create empty dataframe to record the training record
-df = pd.DataFrame(columns=["Network", "Parameter", "Dataset", "Epoch", "Device", "Time cost(sec)", "Batch size", "Lr","Best test acc"])
+if not os.path.exists(net_name+".csv"):
+    df = pd.DataFrame(columns=["Network", "Parameter", "Dataset", "Epoch", "Device", "Time cost(sec)", "Batch size", "Lr","Best test acc"])
+df = pd.read_csv(os.getcwd()+"/"+net_name+".csv")
 
 # Train
 print("Train {} on {}".format(net_name, device))
-print("{} images for training, {}images for validation\n".format(num_train,num_test))
+print("{} images for training, {} images for validation\n".format(num_train,num_test))
 total_time = 0.0
 for epoch in range(num_epochs):
     batch_time = time.time()
@@ -85,7 +87,7 @@ for epoch in range(num_epochs):
     total_time += (time_end - batch_time)
     print("Epoch {}, train_loss {}, train_acc {}, best_acc {}, test_acc {}, time cost {} sec".format(epoch+1, "%.4f" % train_loss, "%.2f" % train_acc, "%.2f" %best_acc, "%.2f" %test_acc,  "%.2f" %(time_end - batch_time)))
 # number of parameter
-with open(net_name.lower()+".txt", "r") as f:
+with open("vgg13.txt", "r") as f:
     for line in f:
         if "Total params: " in line:
             num_para = line.split()[-1]

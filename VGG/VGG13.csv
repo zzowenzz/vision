@@ -1,2 +1,3 @@
 Network,Parameter,Dataset,Epoch,Device,Time cost(sec),Batch size,Lr,Best test acc
 VGG13,"128,990,666",FashionMNIST,10,Tesla T4,6914.1,128,0.1,0.9266
+VGG13,"128,990,666",FashionMNIST,10,Quadro RTX 5000,4044.5,128,0.1,0.9255
