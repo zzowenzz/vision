@@ -1,0 +1,2 @@
+Network,Parameter,Dataset,Epoch,Device,Time cost(sec),Batch size,Lr,Best test acc
+VGG19,"139,610,058",FashionMNIST,10,Quadro RTX 5000,5607.1,128,0.1,0.1
