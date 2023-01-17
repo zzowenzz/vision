@@ -16,6 +16,7 @@ Benchmark
 | VGG13 | 128990666 | FashionMNIST | 10 | Quadro RTX 5000 | 4044.5 | 128 | 0.1 | 0.9255 |
 | VGG16 | 134300362 | FashionMNIST | 10 | Quadro RTX 5000 | 7263.1 | 128 | 0.1 | 0.1 |
 | VGG19 | 139610058 | FashionMNIST | 10 | Quadro RTX 5000 | 5607.1 | 128 | 0.1 | 0.1 |
+| GoogleNet | 10327758 | FashionMNIST | 10 | Quadro RTX 5000 | 1168.9 | 128 | 0.1| 0.8831 |
 
 * * * 
 Credit:
