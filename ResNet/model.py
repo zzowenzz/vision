@@ -145,9 +145,18 @@ def resnext101_32x8d(num_classes=10, include_top=True):
                   groups=groups,
                   width_per_group=width_per_group)
 
+def resnext152(num_classes=10, include_top=True):
+    groups = 32
+    width_per_group = 8
+    return ResNet(Bottleneck, [3, 8, 36, 3],
+                  num_classes=num_classes,
+                  include_top=include_top,
+                  groups=groups,
+                  width_per_group=width_per_group)
+
 # test for shape
-net = resnext101_32x8d()
+net = resnext152()
 report = torchinfo.summary(net, input_size=(1,1,224,224))
 summary_report = str(report)
-with open("resnext101_32x8d.txt", "w") as f:
+with open("resnext152.txt", "w") as f:
     f.write((summary_report))
