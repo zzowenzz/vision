@@ -1,0 +1,2 @@
+Network,Parameter,Dataset,Epoch,Device,Time cost(sec),Batch size,Lr,Best test acc
+GoogleNet,"10,327,758",FashionMNIST,10,Quadro RTX 5000,1168.9,128,0.1,0.8831

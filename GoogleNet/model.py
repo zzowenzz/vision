@@ -58,7 +58,7 @@ class InceptionAux(nn.Module):
         return x
 
 class GoogLeNet(nn.Module):
-    def __init__(self, num_classes=10, aux_logits=True):
+    def __init__(self, num_classes=10, aux_logits=False):
         super(GoogLeNet, self).__init__()
         self.aux_logits = aux_logits
         self.conv1 = BasicConv2d(1, 64, kernel_size=7, stride=2, padding=3)
@@ -114,8 +114,8 @@ class GoogLeNet(nn.Module):
         return x
 
 # test for shape
-net = GoogLeNet()
-report = torchinfo.summary(net, input_size=(1,1,224,224))
-summary_report = str(report)
-with open("GoogleNet.txt", "w") as f:
-    f.write((summary_report))
+# net = GoogLeNet()
+# report = torchinfo.summary(net, input_size=(1,1,224,224))
+# summary_report = str(report)
+# with open("GoogleNet.txt", "w") as f:
+#     f.write((summary_report))
