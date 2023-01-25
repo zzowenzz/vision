@@ -151,8 +151,8 @@ def resnet152(num_classes=10, include_top=True):
                   width_per_group=width_per_group)
 
 # test for shape
-# net = resnext152()
+# net = resnet152()
 # report = torchinfo.summary(net, input_size=(1,1,224,224))
 # summary_report = str(report)
-# with open("resnext152.txt", "w") as f:
+# with open("resnet152.txt", "w") as f:
 #     f.write((summary_report))
