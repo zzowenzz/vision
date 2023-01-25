@@ -60,13 +60,13 @@ class Bottleneck(nn.Module):
 
 
 class ResNet(nn.Module):
-    def __init__(self, block, blocks_num, num_classes=10, include_top=True, groups=1, width_per_group=64):
+    def __init__(self, block, blocks_num, num_classes=10, include_top=True, groups=1, width_per_group=64): # groups and width_per_group are for group convolution
         super(ResNet, self).__init__()
         self.include_top = include_top
         self.in_channel = 64
         self.groups = groups
         self.width_per_group = width_per_group
-        self.conv1 = nn.Conv2d(1, self.in_channel, kernel_size=7, stride=2, padding=3, bias=False) # inpu channel is set to 1 for FashionMNIST dataset
+        self.conv1 = nn.Conv2d(1, self.in_channel, kernel_size=7, stride=2, padding=3, bias=False) # input channel is set to 1 for FashionMNIST dataset
         self.bn1 = nn.BatchNorm2d(self.in_channel)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
@@ -88,7 +88,7 @@ class ResNet(nn.Module):
                 nn.Conv2d(self.in_channel, channel * block.expansion, kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(channel * block.expansion))
         layers = []
-        layers.append(block(self.in_channel, channel, downsample=downsample, stride=stride, groups=self.groups, width_per_group=self.width_per_group))
+        layers.append(block(self.in_channel, channel, downsample=downsample, stride=stride, groups=self.groups, width_per_group=self.width_per_group)) # add goups and width_per_group
         self.in_channel = channel * block.expansion
         for _ in range(1, block_num):
             layers.append(block(self.in_channel, channel, groups=self.groups, width_per_group=self.width_per_group))
