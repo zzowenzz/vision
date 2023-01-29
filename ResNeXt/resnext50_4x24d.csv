@@ -1,0 +1,2 @@
+Network,Parameter,Dataset,Epoch,Device,Time cost(sec),Batch size,Lr,Best test acc
+resnext50_4x24d,"25,286,696",FashionMNIST,10,Quadro RTX 5000,4092.9,32,0.1,0.9248

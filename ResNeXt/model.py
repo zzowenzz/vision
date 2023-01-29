@@ -185,8 +185,8 @@ def resnext101_32x8d(num_classes=10, include_top=True):
 
 
 # test for shape
-net = resnext101_32x8d()
-report = torchinfo.summary(net, input_size=(1,1,224,224))
-summary_report = str(report)
-with open("resnext101_32x8d.txt", "w") as f:
-    f.write((summary_report))
+# net = resnext101_32x8d()
+# report = torchinfo.summary(net, input_size=(1,1,224,224))
+# summary_report = str(report)
+# with open("resnext101_32x8d.txt", "w") as f:
+#     f.write((summary_report))
