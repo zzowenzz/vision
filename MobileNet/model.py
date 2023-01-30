@@ -14,6 +14,62 @@ def _make_divisible(ch, divisor=8, min_ch=None):
         new_ch += divisor
     return new_ch
 
+class ConvBNReLU(nn.Sequential): 
+    def __init__(self, in_channel, out_channel, kernel_size=3, stride=1):
+        super(ConvBNReLU, self).__init__(
+            nn.Conv2d(in_channel, out_channel, kernel_size, stride, (kernel_size - 1) // 2, bias=False),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU(inplace=True)
+        )
+
+class DWConvBNReLU(nn.Sequential): 
+    def __init__(self, in_channel, out_channel, stride):
+        super(DWConvBNReLU, self).__init__(
+            nn.Conv2d(in_channel, in_channel, kernel_size=3, stride=stride, padding=1, groups=in_channel),
+            nn.BatchNorm2d(in_channel),
+            nn.ReLU6(inplace=True),
+
+            nn.Conv2d(in_channel, out_channel, kernel_size=1, stride=1),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU6(inplace=True)
+        )
+
+class MobileNetV1(nn.Module):
+    def __init__(self, num_classes=10):
+        super(MobileNetV1, self).__init__()
+        setting = [
+            [32, 64, 1],
+            [64, 128, 2],
+            [128, 128, 1],
+            [128, 256, 2],
+            [256, 256, 1],
+            [256, 512, 2],
+            [512, 512, 1],
+            [512, 512, 1],
+            [512, 512, 1],
+            [512, 512, 1],
+            [512, 512, 1],
+            [512, 1024, 2],
+            [1024, 1024, 1]
+        ]
+        features = []
+        features.append(ConvBNReLU(1, 32, stride=2))
+        for in_channel, out_channel, stride in setting:
+            features.append(DWConvBNReLU(in_channel, out_channel, stride))
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.classifier = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(setting[-1][1], num_classes)
+        )
+        self.features = nn.Sequential(*features)
+    
+    def forward(self, x):
+        x = self.features(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
 class ConvBNReLU6(nn.Sequential): # conv+bn+relu6; conv can be gconv
     def __init__(self, in_channel, out_channel, kernel_size=3, stride=1, groups=1):
         super(ConvBNReLU6, self).__init__(
@@ -82,8 +138,8 @@ class MobileNetV2(nn.Module):
         return x
 
 # test for shape
-# net = MobileNetV2()
-# report = torchinfo.summary(net, input_size=(1,1,224,224))
-# summary_report = str(report)
-# with open("MobileNetV2.txt", "w") as f:
-#     f.write((summary_report))
+net = MobileNetV1()
+report = torchinfo.summary(net, input_size=(1,1,224,224))
+summary_report = str(report)
+with open("MobileNetV1.txt", "w") as f:
+    f.write((summary_report))
