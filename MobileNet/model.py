@@ -138,8 +138,8 @@ class MobileNetV2(nn.Module):
         return x
 
 # test for shape
-net = MobileNetV1()
-report = torchinfo.summary(net, input_size=(1,1,224,224))
-summary_report = str(report)
-with open("MobileNetV1.txt", "w") as f:
-    f.write((summary_report))
+# net = MobileNetV1()
+# report = torchinfo.summary(net, input_size=(1,1,224,224))
+# summary_report = str(report)
+# with open("MobileNetV1.txt", "w") as f:
+#     f.write((summary_report))
