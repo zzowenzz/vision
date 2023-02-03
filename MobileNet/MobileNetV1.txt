@@ -4,7 +4,7 @@ Layer (type:depth-idx)                   Output Shape              Param #
 MobileNetV1                              [1, 10]                   --
 ├─Sequential: 1-1                        [1, 1024, 7, 7]           --
 │    └─ConvBNReLU: 2-1                   [1, 32, 112, 112]         --
-│    │    └─Conv2d: 3-1                  [1, 32, 112, 112]         288
+│    │    └─Conv2d: 3-1                  [1, 32, 112, 112]         320
 │    │    └─BatchNorm2d: 3-2             [1, 32, 112, 112]         64
 │    │    └─ReLU: 3-3                    [1, 32, 112, 112]         --
 │    └─DWConvBNReLU: 2-2                 [1, 64, 112, 112]         --
@@ -103,10 +103,10 @@ MobileNetV1                              [1, 10]                   --
 │    └─Dropout: 2-15                     [1, 1024]                 --
 │    └─Linear: 2-16                      [1, 10]                   10,250
 ==========================================================================================
-Total params: 3,227,562
-Trainable params: 3,227,562
+Total params: 3,227,594
+Trainable params: 3,227,594
 Non-trainable params: 0
-Total mult-adds (M): 565.16
+Total mult-adds (M): 565.57
 ==========================================================================================
 Input size (MB): 0.20
 Forward/backward pass size (MB): 80.68
