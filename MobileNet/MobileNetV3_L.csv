@@ -1,0 +1,2 @@
+Network,Parameter,Dataset,Epoch,Device,Time cost(sec),Batch size,Lr,Best test acc
+MobileNetV3_L,"4,214,554",FashionMNIST,10,Quadro RTX 5000,1902.3,128,0.1,0.9169

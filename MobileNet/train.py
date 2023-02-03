@@ -3,7 +3,7 @@ import torchvision
 from torch.utils import data
 from torchvision import transforms
 from torch import nn as nn
-from model import MobileNetV1, MobileNetV2
+from model import MobileNetV1, MobileNetV2, mobilenet_v3_small, mobilenet_v3_large
 import pandas as pd
 import time
 import multiprocessing
@@ -33,8 +33,8 @@ lr, num_epochs = 0.1, 10
 best_acc, save_path = 0.0, "best.pth"
 
 # Prepare all parts: network, device, data iterator, network initialization, optimizer, loss function
-net = MobileNetV2()
-net_name = "MobileNetV2"
+net = mobilenet_v3_large()
+net_name = "MobileNetV3_L"
 device = try_gpu()
 train_iter, test_iter, num_train, num_test = load_data(batch_size)
 def init_weights(m):
@@ -88,7 +88,7 @@ for epoch in range(num_epochs):
     total_time += (time_end - batch_time)
     print("Epoch {}, train_loss {}, train_acc {}, best_acc {}, test_acc {}, time cost {} sec".format(epoch+1, "%.4f" % train_loss, "%.2f" % train_acc, "%.2f" %best_acc, "%.2f" %test_acc,  "%.2f" %(time_end - batch_time)))
 # number of parameter
-with open("MobileNetV2.txt", "r") as f:
+with open("MobileNetV3_L.txt", "r") as f:
     for line in f:
         if "Total params: " in line:
             num_para = line.split()[-1]
