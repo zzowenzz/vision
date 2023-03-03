@@ -1,0 +1,2 @@
+Network,Parameter,Dataset,Epoch,Device,Time cost(sec),Batch size,Lr,Best test acc
+shufflenet_v2_x2_0,"351,610",FashionMNIST,10,Quadro RTX 5000,1565.6,128,0.1,0.9219

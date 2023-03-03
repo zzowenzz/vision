@@ -6,11 +6,11 @@ from typing import List, Callable
 
 
 def channel_shuffle(x: Tensor, groups: int) -> Tensor: # shuffle fmap x into groups
-    batch_size, num_channels, height, width = x.size()
+    batch_size, num_channels, height, width = x.size() # BCHW
     channels_per_group = num_channels // groups
-    # [batch_size, num_channels, height, width] -> [batch_size, groups, channels_per_group, height, width]
+    # x.view: [batch_size, num_channels, height, width] -> [batch_size, groups, channels_per_group, height, width]
     x = x.view(batch_size, groups, channels_per_group, height, width)
-    # [batch_size, groups, channels_per_group, height, width] ->[batch_size, channels_per_group, groups, height, width]
+    # torch.transpose: [batch_size, groups, channels_per_group, height, width] ->[batch_size, channels_per_group, groups, height, width]
     x = torch.transpose(x, 1, 2).contiguous()
     # flatten; [batch_size, channels_per_group, groups, height, width]->[batch_size, channels_per_group*groups, height, width]
     x = x.view(batch_size, -1, height, width)
@@ -26,8 +26,6 @@ class InvertedResidual(nn.Module):
 
         assert output_c % 2 == 0 # evenly split the channel
         branch_features = output_c // 2
-        # 当stride为1时，input_channel应该是branch_features的两倍
-        # python中 '<<' 是位运算，可理解为计算×2的快速方法
         assert (self.stride != 1) or (input_c == branch_features << 1)
         
         # branch 1(the left branch in Fig3(c and d))
@@ -48,8 +46,10 @@ class InvertedResidual(nn.Module):
                       stride=1, padding=0, bias=False),
             nn.BatchNorm2d(branch_features),
             nn.ReLU(inplace=True),
+
             self.depthwise_conv(branch_features, branch_features, kernel_s=3, stride=self.stride, padding=1), # stride = 2 or 1
             nn.BatchNorm2d(branch_features),
+
             nn.Conv2d(branch_features, branch_features, kernel_size=1, stride=1, padding=0, bias=False),
             nn.BatchNorm2d(branch_features),
             nn.ReLU(inplace=True)
@@ -89,9 +89,9 @@ class ShuffleNetV2(nn.Module):
         self._stage_out_channels = stages_out_channels
 
         input_channels = 1 # in_channel = 1 for FashionMNIST dataset
-        output_channels = self._stage_out_channels[0] # layer between Stage2
+        output_channels = self._stage_out_channels[0] 
         self.conv1 = nn.Sequential(
-            nn.Conv2d(input_channels, output_channels, kernel_size=3, stride=2, padding=1, bias=False),
+            nn.Conv2d(input_channels, output_channels, kernel_size=3, stride=2, padding=1, bias=False), # output_channels=24
             nn.BatchNorm2d(output_channels),
             nn.ReLU(inplace=True)
         )
@@ -105,14 +105,15 @@ class ShuffleNetV2(nn.Module):
 
         stage_names = ["stage{}".format(i) for i in [2, 3, 4]]
         for name, repeats, output_channels in zip(stage_names, stages_repeats,
-                                                  self._stage_out_channels[1:]): # output_channels iterate from Stage2
+                                                  self._stage_out_channels[1:]): 
+            # output_channels iterate from Stage2. stage_names=["stage2"], stages_repeats=4, self._stage_out_channels[1:]=48 for the fitst iteration
             seq = [inverted_residual(input_channels, output_channels, 2)] # the first shuffle unit in each stage, with stride=2
             for i in range(repeats - 1): # for the rest shuffle units in each stage, the stride is becoming 1
                 seq.append(inverted_residual(output_channels, output_channels, 1)) # num_channel remains
-            setattr(self, name, nn.Sequential(*seq))  # set each name to be a nn.Sequential(*seq) 即循环一次，设置一个name变量为一个解析seq的nn.Sequential()
-            input_channels = output_channels # after iterating each stage, input_channels becomes output_channels
+            setattr(self, name, nn.Sequential(*seq))
+            input_channels = output_channels # after iterating each stage, input_channels for next stage becomes output_channels for this stage
 
-        output_channels = self._stage_out_channels[-1] # after iterating stage 1 to 4, the output_channels becomes the last element in _stage_out_channels
+        output_channels = self._stage_out_channels[-1] # after iterating stage 1 to 4, the output_channels becomes the last element in _stage_out_channels, which is for Conv5
         # the new stage in shufflenet v2
         self.conv5 = nn.Sequential(
             nn.Conv2d(input_channels, output_channels, kernel_size=1, stride=1, padding=0, bias=False),
@@ -130,7 +131,7 @@ class ShuffleNetV2(nn.Module):
         x = self.stage3(x)
         x = self.stage4(x)
         x = self.conv5(x)
-        x = x.mean([2, 3])  # global pool; 2,3 is for height and width dim
+        x = x.mean([2, 3])  # global pool; x is [b,c,h,w]; 2,3 is for height and width dim; [b,c,h,w] -> [b,c]
         x = self.fc(x)
         return x
 
@@ -162,8 +163,8 @@ def shufflenet_v2_x2_0(num_classes=10):
     return model
 
 # Test layers in the network
-net = shufflenet_v2_x2_0()
-report = torchinfo.summary(net, input_size=(1,1,224,224))
-summary_report = str(report)
-with open("shufflenet_v2_x2_0.txt", "w") as f:
-    f.write((summary_report))
+# net = shufflenet_v2_x2_0()
+# report = torchinfo.summary(net, input_size=(1,1,224,224))
+# summary_report = str(report)
+# with open("shufflenet_v2_x2_0.txt", "w") as f:
+#     f.write((summary_report))
