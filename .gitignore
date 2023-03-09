@@ -14,3 +14,8 @@ data/
 test.ipynb
 
 /.idea/
+
+# debug files for vscode
+.vscode/
+
+Toolbox/
