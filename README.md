@@ -21,7 +21,7 @@ Benchmark
 | resnet34 | 21,283,530 | FashionMNIST | 10 | Quadro RTX 5000 | 1587.0 | 128 | 0.1 | 0.9198
 | resnet50 | 23,522,250 | FashionMNIST | 10 | Quadro RTX 5000 | 3138.0 | 128 | 0.1 | 0.9065 | 
 | resnet101 | 42,514,378 | FashionMNIST | 10 | Quadro RTX 5000 | 5169.2 | 64 | 0.1 | 0.9201 | 
-| resnet152 | 120,337,610 | FashionMNIST | 10 | Quadro RTX 5000 | 18862.0 | 32 | 0.1  0.9199 | 
+| resnet152 | 120,337,610 | FashionMNIST | 10 | Quadro RTX 5000 | 18862.0 | 32 | 0.1 | 0.9199 | 
 | resnext50_2x40d | 25,418,728 | FashionMNIST | 10 | Quadro RTX 5000 | 3889.7 | 32 | 0.1 | 0.9194 | 
 | resnext50_4x24d | 25,286,696 | FashionMNIST | 10 | Quadro RTX 5000 | 4092.9 | 32 | 0.1 | 0.9248 |
 | resnext50_8x14d | 25,596,744 | FashionMNIST | 10 | Quadro RTX 5000 | 4551.3 | 32 | 0.1 | 0.922 |
@@ -29,7 +29,7 @@ Benchmark
 | resnext101_2x40d | 44,450,024 | FashionMNIST | 10 | Quadro RTX 5000 | 6334.2 | 32 | 0.1 | 0.9209 |
 | resnext101_4x24d | 44,357,160 | FashionMNIST | 10 | Quadro RTX 5000 | 6708.1 | 32 | 0.1 | 0.9298 |
 | resnext101_8x14d | 45,098,056 | FashionMNIST | 10 | Quadro RTX 5000 | 7477.0 | 32 | 0.1 | 0.9237 |
-| resnext101_32x8d | 86,756,554 | FashionMNIST | 10 | Quadro RTX 5000 | 13108.5 | 32 | | 0.1 | 0.9167 |
+| resnext101_32x8d | 86,756,554 | FashionMNIST | 10 | Quadro RTX 5000 | 13108.5 | 32 | 0.1 | 0.9167 |
 | MobileNetV1 | 3,227,562 | FashionMNIST | 10 | Quadro RTX 5000 | 1144.9 | 128 | 0.1 | 0.9252 |
 | MobileNetV2 | 2,236,106 | FashionMNIST | 10 | Quadro RTX 5000 | 1293.3 | 128 | 0.1 | 0.9208 |
 | MobileNetV3_L | 4,214,554 | FashionMNIST | 10 | Quadro RTX 5000 | 1902.3 | 128 | 0.1 | 0.9169 |
