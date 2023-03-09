@@ -1,0 +1,2 @@
+Network,Parameter,Dataset,Epoch,Device,Time cost(sec),Batch size,Lr,Best test acc
+efficientnet_b1,"6,525,418",FashionMNIST,10,Quadro RTX 5000,4181.8,64,0.1,0.9335
