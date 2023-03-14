@@ -1,7 +1,3 @@
-"""
-original code from rwightman:
-https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision_transformer.py
-"""
 from functools import partial
 from collections import OrderedDict
 
@@ -11,28 +7,17 @@ import torchinfo
 
 
 def drop_path(x, drop_prob: float = 0., training: bool = False):
-    """
-    Drop paths (Stochastic Depth) per sample (when applied in main path of residual blocks).
-    This is the same as the DropConnect impl I created for EfficientNet, etc networks, however,
-    the original name is misleading as 'Drop Connect' is a different form of dropout in a separate paper...
-    See discussion: https://github.com/tensorflow/tpu/issues/494#issuecomment-532968956 ... I've opted for
-    changing the layer and argument names to 'drop path' rather than mix DropConnect as a layer name and use
-    'survival rate' as the argument.
-    """
     if drop_prob == 0. or not training:
         return x
     keep_prob = 1 - drop_prob
-    shape = (x.shape[0],) + (1,) * (x.ndim - 1)  # work with diff dim tensors, not just 2D ConvNets
+    shape = (x.shape[0],) + (1,) * (x.ndim - 1) 
     random_tensor = keep_prob + torch.rand(shape, dtype=x.dtype, device=x.device)
-    random_tensor.floor_()  # binarize
+    random_tensor.floor_()  
     output = x.div(keep_prob) * random_tensor
     return output
 
 
 class DropPath(nn.Module):
-    """
-    Drop paths (Stochastic Depth) per sample  (when applied in main path of residual blocks).
-    """
     def __init__(self, drop_prob=None):
         super(DropPath, self).__init__()
         self.drop_prob = drop_prob
@@ -42,9 +27,6 @@ class DropPath(nn.Module):
 
 
 class PatchEmbed(nn.Module):
-    """
-    2D Image to Patch Embedding
-    """
     def __init__(self, img_size=224, patch_size=16, in_c=3, embed_dim=768, norm_layer=None):
         super().__init__()
         img_size = (img_size, img_size)
@@ -61,9 +43,6 @@ class PatchEmbed(nn.Module):
         B, C, H, W = x.shape
         assert H == self.img_size[0] and W == self.img_size[1], \
             f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
-
-        # flatten: [B, C, H, W] -> [B, C, HW]
-        # transpose: [B, C, HW] -> [B, HW, C]
         x = self.proj(x).flatten(2).transpose(1,2)
         x = self.norm(x)
         return x
@@ -71,7 +50,7 @@ class PatchEmbed(nn.Module):
 
 class Attention(nn.Module):
     def __init__(self,
-                 dim,   # 输入token的dim
+                 dim,   
                  num_heads=8,
                  qkv_bias=False,
                  qk_scale=None,
@@ -87,25 +66,12 @@ class Attention(nn.Module):
         self.proj_drop = nn.Dropout(proj_drop_ratio)
 
     def forward(self, x):
-        # [batch_size, num_patches + 1, total_embed_dim]
         B, N, C = x.shape
-
-        # qkv(): -> [batch_size, num_patches + 1, 3 * total_embed_dim]
-        # reshape: -> [batch_size, num_patches + 1, 3, num_heads, embed_dim_per_head]
-        # permute: -> [3, batch_size, num_heads, num_patches + 1, embed_dim_per_head]
         qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
-        # [batch_size, num_heads, num_patches + 1, embed_dim_per_head]
-        q, k, v = qkv[0], qkv[1], qkv[2]  # make torchscript happy (cannot use tensor as tuple)
-
-        # transpose: -> [batch_size, num_heads, embed_dim_per_head, num_patches + 1]
-        # @: multiply -> [batch_size, num_heads, num_patches + 1, num_patches + 1]
+        q, k, v = qkv[0], qkv[1], qkv[2]
         attn = (q @ k.transpose(-2, -1)) * self.scale
         attn = attn.softmax(dim=-1)
         attn = self.attn_drop(attn)
-
-        # @: multiply -> [batch_size, num_heads, num_patches + 1, embed_dim_per_head]
-        # transpose: -> [batch_size, num_patches + 1, num_heads, embed_dim_per_head]
-        # reshape: -> [batch_size, num_patches + 1, total_embed_dim]
         x = (attn @ v).transpose(1, 2).reshape(B, N, C)
         x = self.proj(x)
         x = self.proj_drop(x)
@@ -113,9 +79,6 @@ class Attention(nn.Module):
 
 
 class Mlp(nn.Module):
-    """
-    MLP as used in Vision Transformer, MLP-Mixer and related networks
-    """
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):
         super().__init__()
         out_features = out_features or in_features
@@ -150,7 +113,6 @@ class Block(nn.Module):
         self.norm1 = norm_layer(dim)
         self.attn = Attention(dim, num_heads=num_heads, qkv_bias=qkv_bias, qk_scale=qk_scale,
                               attn_drop_ratio=attn_drop_ratio, proj_drop_ratio=drop_ratio)
-        # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path_ratio) if drop_path_ratio > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
@@ -237,7 +199,6 @@ class VisionTransformer(nn.Module):
         if self.head_dist is not None:
             x, x_dist = self.head(x[0]), self.head_dist(x[1])
             if self.training and not torch.jit.is_scripting():
-                # during inference, return the average of both classifier predictions
                 return x, x_dist
             else:
                 return (x + x_dist) / 2
@@ -247,10 +208,6 @@ class VisionTransformer(nn.Module):
 
 
 def _init_vit_weights(m):
-    """
-    ViT weight initialization
-    :param m: module
-    """
     if isinstance(m, nn.Linear):
         nn.init.trunc_normal_(m.weight, std=.01)
         if m.bias is not None:
@@ -265,12 +222,6 @@ def _init_vit_weights(m):
 
 
 def vit_base_patch16_224(num_classes: int = 1000):
-    """
-    ViT-Base model (ViT-B/16) from original paper (https://arxiv.org/abs/2010.11929).
-    ImageNet-1k weights @ 224x224, source https://github.com/google-research/vision_transformer.
-    weights ported from official Google JAX impl:
-    链接: https://pan.baidu.com/s/1zqb08naP0RPqqfSXfkB2EA  密码: eu9f
-    """
     model = VisionTransformer(img_size=224,
                               patch_size=16,
                               embed_dim=768,
@@ -282,12 +233,6 @@ def vit_base_patch16_224(num_classes: int = 1000):
 
 
 def vit_base_patch16_224_in21k(num_classes: int = 21843, has_logits: bool = True):
-    """
-    ViT-Base model (ViT-B/16) from original paper (https://arxiv.org/abs/2010.11929).
-    ImageNet-21k weights @ 224x224, source https://github.com/google-research/vision_transformer.
-    weights ported from official Google JAX impl:
-    https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_patch16_224_in21k-e5005f0a.pth
-    """
     model = VisionTransformer(img_size=224,
                               patch_size=16,
                               embed_dim=768,
@@ -299,12 +244,6 @@ def vit_base_patch16_224_in21k(num_classes: int = 21843, has_logits: bool = True
 
 
 def vit_base_patch32_224(num_classes: int = 1000):
-    """
-    ViT-Base model (ViT-B/32) from original paper (https://arxiv.org/abs/2010.11929).
-    ImageNet-1k weights @ 224x224, source https://github.com/google-research/vision_transformer.
-    weights ported from official Google JAX impl:
-    链接: https://pan.baidu.com/s/1hCv0U8pQomwAtHBYc4hmZg  密码: s5hl
-    """
     model = VisionTransformer(img_size=224,
                               patch_size=32,
                               embed_dim=768,
@@ -316,12 +255,6 @@ def vit_base_patch32_224(num_classes: int = 1000):
 
 
 def vit_base_patch32_224_in21k(num_classes: int = 21843, has_logits: bool = True):
-    """
-    ViT-Base model (ViT-B/32) from original paper (https://arxiv.org/abs/2010.11929).
-    ImageNet-21k weights @ 224x224, source https://github.com/google-research/vision_transformer.
-    weights ported from official Google JAX impl:
-    https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_patch32_224_in21k-8db57226.pth
-    """
     model = VisionTransformer(img_size=224,
                               patch_size=32,
                               embed_dim=768,
@@ -333,12 +266,6 @@ def vit_base_patch32_224_in21k(num_classes: int = 21843, has_logits: bool = True
 
 
 def vit_large_patch16_224(num_classes: int = 1000):
-    """
-    ViT-Large model (ViT-L/16) from original paper (https://arxiv.org/abs/2010.11929).
-    ImageNet-1k weights @ 224x224, source https://github.com/google-research/vision_transformer.
-    weights ported from official Google JAX impl:
-    链接: https://pan.baidu.com/s/1cxBgZJJ6qUWPSBNcE4TdRQ  密码: qqt8
-    """
     model = VisionTransformer(img_size=224,
                               patch_size=16,
                               embed_dim=1024,
@@ -350,12 +277,6 @@ def vit_large_patch16_224(num_classes: int = 1000):
 
 
 def vit_large_patch16_224_in21k(num_classes: int = 21843, has_logits: bool = True):
-    """
-    ViT-Large model (ViT-L/16) from original paper (https://arxiv.org/abs/2010.11929).
-    ImageNet-21k weights @ 224x224, source https://github.com/google-research/vision_transformer.
-    weights ported from official Google JAX impl:
-    https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_large_patch16_224_in21k-606da67d.pth
-    """
     model = VisionTransformer(img_size=224,
                               patch_size=16,
                               embed_dim=1024,
@@ -367,12 +288,6 @@ def vit_large_patch16_224_in21k(num_classes: int = 21843, has_logits: bool = Tru
 
 
 def vit_large_patch32_224_in21k(num_classes: int = 21843, has_logits: bool = True):
-    """
-    ViT-Large model (ViT-L/32) from original paper (https://arxiv.org/abs/2010.11929).
-    ImageNet-21k weights @ 224x224, source https://github.com/google-research/vision_transformer.
-    weights ported from official Google JAX impl:
-    https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_large_patch32_224_in21k-9046d2e7.pth
-    """
     model = VisionTransformer(img_size=224,
                               patch_size=32,
                               embed_dim=1024,
@@ -384,11 +299,6 @@ def vit_large_patch32_224_in21k(num_classes: int = 21843, has_logits: bool = Tru
 
 
 def vit_huge_patch14_224_in21k(num_classes: int = 21843, has_logits: bool = True):
-    """
-    ViT-Huge model (ViT-H/14) from original paper (https://arxiv.org/abs/2010.11929).
-    ImageNet-21k weights @ 224x224, source https://github.com/google-research/vision_transformer.
-    NOTE: converted weights not currently available, too large for github release hosting.
-    """
     model = VisionTransformer(img_size=224,
                               patch_size=14,
                               embed_dim=1280,
